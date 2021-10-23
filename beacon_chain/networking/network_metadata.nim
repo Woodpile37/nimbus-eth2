@@ -264,6 +264,9 @@ template mergeTestnet(path: string, eth1Network: Eth1Network): Eth2NetworkMetada
   loadCompileTimeNetworkMetadata(mergeTestnetsDir & "/" & path,
                                  some eth1Network)
 
+template mergeKiln(path: string): Eth2NetworkMetadata =
+  loadCompileTimeNetworkMetadata(mergeTestnetsDir & "/" & path)
+
 when not defined(gnosisChainBinary):
   when const_preset == "mainnet":
     const
@@ -271,8 +274,11 @@ when not defined(gnosisChainBinary):
       praterMetadata* = eth2Network("shared/prater", goerli)
       ropstenMetadata = mergeTestnet("ropsten-beacon-chain", ropsten)
       sepoliaMetadata = mergeTestnet("sepolia", sepolia)
+      kilnMetadata* = mergeKiln("kiln")
     static:
-      for network in [mainnetMetadata, praterMetadata, ropstenMetadata, sepoliaMetadata]:
+      for network in [
+          mainnetMetadata, praterMetadata, ropstenMetadata, sepoliaMetadata,
+          kilnMetadata]:
         checkForkConsistency(network.cfg)
 
   proc getMetadataForNetwork*(networkName: string): Eth2NetworkMetadata {.raises: [Defect, IOError].} =
@@ -298,6 +304,8 @@ when not defined(gnosisChainBinary):
           ropstenMetadata
         of "sepolia":
           sepoliaMetadata
+        of "kiln":
+          kilnMetadata
         else:
           loadRuntimeMetadata()
       else:
