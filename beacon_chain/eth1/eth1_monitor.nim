@@ -1198,7 +1198,6 @@ proc syncBlockRange(m: Eth1Monitor,
 
     let blocksWithDeposits = depositEventsToBlocks(depositLogs)
 
-    m.eth1Progress.fire()
     for i in 0 ..< blocksWithDeposits.len:
       let blk = blocksWithDeposits[i]
 
@@ -1471,6 +1470,7 @@ proc startEth1Syncing(m: Eth1Monitor, delayBeforeStart: Duration) {.async.} =
       if m.latestEth1Block.isSome and
          m.latestEth1Block.get == fullBlockId:
         await sleepAsync(m.cfg.SECONDS_PER_ETH1_BLOCK.int.seconds)
+        continue
 
       m.latestEth1Block = some fullBlockId
       blk
